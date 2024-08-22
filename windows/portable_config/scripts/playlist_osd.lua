@@ -157,26 +157,26 @@ function get_name_from_index(i, notitle)
 	local _, name = nil
 	local title = mp.get_property("playlist/" .. i .. "/title")
 	local name = mp.get_property("playlist/" .. i .. "/filename")
+    -- 注释掉该部分以确保显示的为实际的文件名，而非视频内置标题
+	-- --check if file has a media title stored or as property
+	-- if not title then
+	-- 	local mtitle = mp.get_property("media-title")
+	-- 	if i == pos and mp.get_property("filename") ~= mtitle then
+	-- 		if not title_table[name] then
+	-- 			title_table[name] = mtitle
+	-- 		end
+	-- 		title = mtitle
+	-- 	elseif title_table[name] then
+	-- 		title = title_table[name]
+	-- 	end
+	-- end
 
-	--check if file has a media title stored or as property
-	if not title then
-		local mtitle = mp.get_property("media-title")
-		if i == pos and mp.get_property("filename") ~= mtitle then
-			if not title_table[name] then
-				title_table[name] = mtitle
-			end
-			title = mtitle
-		elseif title_table[name] then
-			title = title_table[name]
-		end
-	end
-
-	--if we have media title use a more conservative strip
-	if title and not notitle then
-		-- Escape a string for verbatim display on the OSD
-		-- Ref: https://github.com/mpv-player/mpv/blob/94677723624fb84756e65c8f1377956667244bc9/player/lua/stats.lua#L145
-		return stripfilename(title, true):gsub("\\", "\\\239\187\191"):gsub("{", "\\{"):gsub("^ ", "\\h")
-	end
+	-- --if we have media title use a more conservative strip
+	-- if title and not notitle then
+	-- 	-- Escape a string for verbatim display on the OSD
+	-- 	-- Ref: https://github.com/mpv-player/mpv/blob/94677723624fb84756e65c8f1377956667244bc9/player/lua/stats.lua#L145
+	-- 	return stripfilename(title, true):gsub("\\", "\\\239\187\191"):gsub("{", "\\{"):gsub("^ ", "\\h")
+	-- end
 
 	--remove paths if they exist, keeping protocols for stripping
 	if string.sub(name, 1, 1) == "/" or name:match("^%a:[/\\]") then
@@ -201,6 +201,8 @@ end
 function parse_filename(string, name, index)
 	local base = tostring(plen):len()
 	local esc_name = stripfilename(name):gsub("%%", "%%%%")
+    -- local esc_title = stripfilename(mp.get_property("media-title"), true):gsub("%%", "%%%%")
+	-- local esc_file = stripfilename(mp.get_property("filename")):gsub("%%", "%%%%")
 	return string:gsub("%%N", "\\N")
 				 :gsub("%%pos", string.format("%0" .. base .. "d", index+1))
 				 :gsub("%%name", esc_name)
